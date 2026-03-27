@@ -1,16 +1,27 @@
 package Product;
 
 public class Product {
-    private String productName;
-    private int productPrice;
-    private String productDescription;
-    private int productStock;
+    private final String productName;
+    private final int productPrice;
+    private final String productDescription;
+    private final int productStock;
 
     public Product(String productName, int productPrice, String productDescription, int productStock) {
         this.productName = productName;
         this.productPrice = productPrice;
         this.productDescription = productDescription;
         this.productStock = productStock;
+    }
+
+    // 선택함 상품의 정보를 출력해주는 함수
+    // product의 역할
+    // printProductInfo로 이름을 바꾸기
+    public void printProductInfo() {
+        System.out.printf("\n선택한 상품 :%-14s", getProductName());
+        // 10칸을 소지하고 1000 단위로 , 를 찍어주고 오른쪽 정렬
+        System.out.printf("|%,11d원", getProductPrice());
+        System.out.print(" | " + getProductDescription());
+        System.out.printf(" | 재고 :%,3d개\n\n", getProductStock());
     }
 
     public String getProductName() {
