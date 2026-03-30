@@ -3,20 +3,28 @@ package Commerce;
 import IO.InputSystem;
 import Product.Product;
 import Product.Category;
-import Product.Cart;
+import Product.Database;
+import Product.Screen;
+import Product.CategoryScreen;
+import Product.ProductScreen;
+import Product.CartScreen;
 import Exception.GoBackException;
 import Exception.LoopEndException;
 
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
+import java.util.*;
 
 public class CommerceSystem {
+    private final Map<String, Screen> screenMap =  new HashMap<String, Screen>();
+    private final Database database =  new Database();
 
-    private final List<Category> categories;
-    private final Cart cart = new Cart();
+    private final CategoryScreen categoryScreen =  new CategoryScreen(database);
+    private final ProductScreen productScreen =  new ProductScreen(database);
+    private final CartScreen cartScreen =  new CartScreen(database);
 
-    protected boolean isEnd = false;
+    private final String adminCode = "tjdgns0618";
+    private int adminTryCount = 0;
+
+    protected boolean loopEnd = false;
 
     // CommerceSystem을 main이외에도 여기저기서 사용할 거면 main에 적어두는게 좋다.
     public CommerceSystem() {
@@ -50,100 +58,87 @@ public class CommerceSystem {
         categories.add(clotheCategory);
         categories.add(foodCategory);
 
-        this.categories = categories;
-    }
+        screenMap.put("카테고리", categoryScreen);
+        screenMap.put("상품선택", productScreen);
+        screenMap.put("장바구니", cartScreen);
 
-    // 존재하는 카테고리 전체 출력해주는 함수
-    private void printCategories() {
-        int i = 1;
+        database.setScreenName("카테고리");
 
-        System.out.println("[ 실시간 커머스 플랫폼 메인 ]");
-        for (Category category : categories) {
-            // 카테고리명 출력
-            System.out.println(i + ". " + category.getCategoryName());
-            i++;
-        }
-
-        // 장바구니에 상품을 담으면 출력됨
-        cart.printCartMenu();
-
-        System.out.println("0. 종료      | 프로그램 종료");
+        database.saveCategories(categories);
     }
 
     // 존재하는 카테고리 번호인지 검사하고 그 번호를 반환하는 함수
-    private int returnCategoryID() throws LoopEndException {
-        int input;
-        while (true) {
-            // 카테고리 내용물 출력
-            printCategories();
-
-            try {
-                input = InputSystem.inputInt();
-            } catch (InputMismatchException e) {
-                System.out.println("\n숫자만 입력해주세요.\n");
-                InputSystem.clearBuffer();
-                continue;
-            }
-
-            if(cart.isEmpty()) {
-                if (input < 0 || input > categories.size() + 2) {
-                    // 카테고리 리스트의 인덱스 예외처리
-                    System.out.println("\n선택지에 해당하는 숫자를 입력해주세요.\n");
-                    continue;
-                }
-            }else{
-                if (input < 0 || input > categories.size()) {
-                    // 카테고리 리스트의 인덱스 예외처리
-                    System.out.println("\n카테고리에 해당하는 숫자를 입력해주세요.\n");
-                    continue;
-                }
-            }
-            break;
-        }
-
-        if (input == 0) {
-            System.out.println("==========================\n프로그램을 종료합니다.");
-            throw new LoopEndException();
-        }
-        return input;
-    }
-    // input 이 0이면 isEnd = true 하고
-
-    // 선택한 카테고리를 반환해주는 함수
-    // commerceSystem.selectCategory() <- 얘는 여기서 써도 되는것
-    protected Category selectCategory(int id) throws LoopEndException {
-        // List에서 특정 인덱스의 값에 접근하는 방법 get (0부터이니 -1 해줘야함)
-        return categories.get(id - 1);
-    }
+//    private int returnCategoryID() throws LoopEndException {
+//        int input;
+//        while (true) {
+//            // 카테고리 내용물 출력
+//            // printCategories();
+//        }
+//
+//        if (input == 0) {
+//            System.out.println("==========================\n프로그램을 종료합니다.");
+//            throw new LoopEndException();
+//        }
+//        return input;
+//    }
+//    // input 이 0이면 loopEnd = true 하고
+//
+//    // 선택한 카테고리를 반환해주는 함수
+//    // commerceSystem.selectCategory() <- 얘는 여기서 써도 되는것
+//    protected Category selectCategory(int id) throws LoopEndException {
+//        // List에서 특정 인덱스의 값에 접근하는 방법 get (0부터이니 -1 해줘야함)
+//        return categories.get(id - 1);
+//    }
 
     // 커머스 시스템 실행 함수
-    public void start() {
-        while (!isEnd) {
+    public void start() throws LoopEndException {
+        while (!loopEnd) {
             try {
-                int menuId = returnCategoryID();
+                Screen currentScreen = screenMap.get(database.getScreenName());
+                currentScreen.display();
 
-                // 입력한 번호가 카테고리 내의 숫자라면
-                if(menuId >= 1 && menuId <= categories.size()) {
-                    // 3개의 카테고리중 한개의 카테고리를 반환해서 초기화
-                    Category selectedCategory = selectCategory(menuId);
-                    // 카테고리 내에 있는 상품을 반환해서 초기화
-                    Product selectedProduct = selectedCategory.selectProduct();
-                    // 선택된 상품의 정보를 출력
-                    selectedProduct.printProductInfo();
-                    cart.addToCart(selectedProduct);
-                }else if(menuId == categories.size() + 1) {
-                    cart.orderCart();
-                }else if(menuId == categories.size() + 2) {
-                    System.out.println("주문 취소 ");
-                }
-            } catch (GoBackException e) {
-                System.out.println("\n이전 메뉴로 돌아갑니다.\n");
-                InputSystem.clearBuffer();
+//                // 입력한 번호가 카테고리 내의 숫자라면
+//                if (menuId >= 1 && menuId <= categories.size()) {
+//                    // 3개의 카테고리중 한개의 카테고리를 반환해서 초기화
+//                    Category selectedCategory = selectCategory(menuId);
+//                    // 카테고리 내에 있는 상품을 반환해서 초기화
+//                    Product selectedProduct = selectedCategory.selectProduct();
+//                    // 선택된 상품의 정보를 출력
+//                    selectedProduct.printProductInfo();
+//                    cart.addToCart(selectedProduct);
+//                } else if (menuId == categories.size() + 1) {
+//                    cart.orderCart();
+//                } else if (menuId == categories.size() + 2) {
+//                    System.out.println("주문 취소 ");
+//                } else if (menuId == 6 && adminTryCount < 3) {
+//                    System.out.println("관리자 비밀번호를 입력해주세요:");
+//                    while (adminTryCount < 3) {
+//                        String adminCode = InputSystem.inputString();
+//                        if (adminCode.equals(this.adminCode)) {
+//                            System.out.println("관리자 인증 성공");
+//                            break;
+//                        } else {
+//                            System.out.println("인증 실패 다시입력해주세요. (남은 횟수 : " + (2 - adminTryCount) + ")");
+//                            adminTryCount++;
+//                            if (adminTryCount == 3)
+//                                System.out.println("인증 실패");
+//                        }
+//                    }
+//                } else {
+//                    System.out.println("관리자 모드에 접근할 수 없습니다.");
+//                }
+
+                // 예외처리 부분=====================
             } catch (NullPointerException e) {
                 System.out.println("\nNullPointerException 발생.\n");
+                System.out.println(database.getScreenName());
+                System.out.println(database.getSelectedCategory());
+                System.out.println(database.getSelectedProduct());
                 break;
             } catch (LoopEndException e) {
-                isEnd = true;
+                loopEnd = true;
+            } catch (GoBackException e) {
+                InputSystem.clearBuffer();
             }
         }
     }
