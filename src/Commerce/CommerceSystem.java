@@ -3,6 +3,7 @@ package Commerce;
 import IO.InputSystem;
 import Product.Product;
 import Product.Category;
+import Product.Cart;
 import Exception.GoBackException;
 import Exception.LoopEndException;
 
@@ -13,6 +14,7 @@ import java.util.List;
 public class CommerceSystem {
 
     private final List<Category> categories;
+    private final Cart cart = new Cart();
 
     protected boolean isEnd = false;
 
@@ -22,7 +24,7 @@ public class CommerceSystem {
         Product electronicProduct1 = new Product("Galaxy S25", 1200000, "최신 안드로이드 스마트폰", 30);
         Product electronicProduct2 = new Product("iPhone 16", 1350000, "Apple의 최신 스마트폰", 15);
         Product electronicProduct3 = new Product("MacBook Pro", 2400000, "M3 칩셋이 탑재된 노트북", 5);
-        Product electronicProduct4 = new Product("AirPods", 350000, "노이즈 캔슬링 무선 이어폰", 1);
+        Product electronicProduct4 = new Product("AirPods", 350000, "노이즈 캔슬링 무선 이어폰", 0);
 
         Product clothesProduct1 = new Product("Adidas Pants", 20000, "아디다스의 신상 바지", 300);
         Product clothesProduct2 = new Product("Adidas Shoes", 30000, "아디다스의 신상 신발", 100);
@@ -61,6 +63,10 @@ public class CommerceSystem {
             System.out.println(i + ". " + category.getCategoryName());
             i++;
         }
+
+        // 장바구니에 상품을 담으면 출력됨
+        cart.printCartMenu();
+
         System.out.println("0. 종료      | 프로그램 종료");
     }
 
@@ -79,13 +85,22 @@ public class CommerceSystem {
                 continue;
             }
 
-            if (input < 0 || input > categories.size()) {
-                // 카테고리 리스트의 인덱스 예외처리
-                System.out.println("\n카테고리에 해당하는 숫자를 입력해주세요.\n");
-                continue;
+            if(cart.isEmpty()) {
+                if (input < 0 || input > categories.size() + 2) {
+                    // 카테고리 리스트의 인덱스 예외처리
+                    System.out.println("\n선택지에 해당하는 숫자를 입력해주세요.\n");
+                    continue;
+                }
+            }else{
+                if (input < 0 || input > categories.size()) {
+                    // 카테고리 리스트의 인덱스 예외처리
+                    System.out.println("\n카테고리에 해당하는 숫자를 입력해주세요.\n");
+                    continue;
+                }
             }
             break;
         }
+
         if (input == 0) {
             System.out.println("==========================\n프로그램을 종료합니다.");
             throw new LoopEndException();
@@ -96,9 +111,7 @@ public class CommerceSystem {
 
     // 선택한 카테고리를 반환해주는 함수
     // commerceSystem.selectCategory() <- 얘는 여기서 써도 되는것
-    protected Category selectCategory() throws LoopEndException {
-        int id = returnCategoryID();
-
+    protected Category selectCategory(int id) throws LoopEndException {
         // List에서 특정 인덱스의 값에 접근하는 방법 get (0부터이니 -1 해줘야함)
         return categories.get(id - 1);
     }
@@ -107,12 +120,22 @@ public class CommerceSystem {
     public void start() {
         while (!isEnd) {
             try {
-                // 3개의 카테고리중 한개의 카테고리를 반환해서 초기화
-                Category selectedCategory = selectCategory();
-                // 카테고리 내에 있는 상품을 반환해서 초기화
-                Product selectedProduct = selectedCategory.selectProduct();     // <=== 0을 입력하면 NullPointerException 발생
-                // 선택된 상품의 정보를 출력
-                selectedProduct.printProductInfo();
+                int menuId = returnCategoryID();
+
+                // 입력한 번호가 카테고리 내의 숫자라면
+                if(menuId >= 1 && menuId <= categories.size()) {
+                    // 3개의 카테고리중 한개의 카테고리를 반환해서 초기화
+                    Category selectedCategory = selectCategory(menuId);
+                    // 카테고리 내에 있는 상품을 반환해서 초기화
+                    Product selectedProduct = selectedCategory.selectProduct();
+                    // 선택된 상품의 정보를 출력
+                    selectedProduct.printProductInfo();
+                    cart.addToCart(selectedProduct);
+                }else if(menuId == categories.size() + 1) {
+                    cart.orderCart();
+                }else if(menuId == categories.size() + 2) {
+                    System.out.println("주문 취소 ");
+                }
             } catch (GoBackException e) {
                 System.out.println("\n이전 메뉴로 돌아갑니다.\n");
                 InputSystem.clearBuffer();

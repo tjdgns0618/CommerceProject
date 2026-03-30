@@ -29,7 +29,8 @@ public class Category {
             System.out.printf(i + ". %-14s", p.getProductName());
             // 10칸을 소지하고 1000 단위로 , 를 찍어주고 오른쪽 정렬
             System.out.printf("| %,11d원", p.getProductPrice());
-            System.out.println(" | " + p.getProductDescription());
+            System.out.print(" | " + p.getProductDescription());
+            System.out.printf(" | 재고 : %2d개\n", p.getProductStock());
 
             i++;
         }
@@ -38,7 +39,7 @@ public class Category {
 
     // 존재하는 상품 번호인지 검사하고 그 번호를 반환하는 함수
     private int returnProductID() {
-        int inputNum = 0;
+        int inputNum;
         while (true) {
             printProducts();
 
