@@ -70,6 +70,7 @@ public class ProductScreen implements Screen {
         }
         if(inputNum == 0){
             database.setScreenName("카테고리");
+            InputSystem.clearBuffer();
             throw new GoBackException();
         }
         return inputNum;
@@ -99,6 +100,7 @@ public class ProductScreen implements Screen {
                     System.out.println("주문 가능 수량이 없습니다.");
                     break;
                 }
+
                 for (Product p : database.getSelectedProducts()) {
                     // 이미 담은 상품인지 검사
                     if (product.getProductName().equals(p.getProductName())) {
@@ -119,7 +121,10 @@ public class ProductScreen implements Screen {
                 }
                 break;
             case 2:
+                InputSystem.clearBuffer();
                 throw new GoBackException();
+            default:
+                System.out.println("아무 숫자 입력");
         }
     }
 

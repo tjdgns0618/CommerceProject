@@ -38,9 +38,6 @@ public class CategoryScreen implements Screen {
         }
         System.out.println("0. 종료      | 프로그램 종료");
 
-        // 장바구니에 상품을 담으면 출력됨
-        // cart.printCartMenu(database.getCategories().size());
-
         // 이 위에 장바구니 확인과 주문 취소가 있어서 + 3
         System.out.println((database.getCategories().size() + 3) + ". 관리자 모드");
     }
@@ -64,22 +61,28 @@ public class CategoryScreen implements Screen {
                 if (input < 0 || input > database.getCategoriesSize() && input != 6) {
                     // 카테고리 리스트의 인덱스 예외처리
                     System.out.println("\n카테고리에 해당하는 숫자를 입력해주세요.\n");
+                    InputSystem.clearBuffer();
                     throw new GoBackException();
                 }
             }
-            if(input == database.getCategoriesSize() + 1) {
-                database.setScreenName("장바구니");
-                throw new GoBackException();
-            }
-
             if (input == 0) {
                 System.out.println("==========================\n프로그램을 종료합니다.");
                 throw new LoopEndException();
+            }else if (input == database.getCategoriesSize() + 1) {
+                database.setScreenName("장바구니");
+                InputSystem.clearBuffer();
+                throw new GoBackException();
+            } else if (input == database.getCategoriesSize() + 2) {
+                System.out.println("주문 취소 버튼");
+            } else if (input == database.getCategoriesSize() + 3) {
+                database.setScreenName("관리자인증");
+                InputSystem.clearBuffer();
+                throw new GoBackException();
             }
+
             return input;
         }
     }
-
 
     // 선택한 카테고리 데이터베이스에 저장시키기
     private void selectCategory(int categoryNumber) {
