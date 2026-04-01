@@ -47,41 +47,53 @@ public class CategoryScreen implements Screen {
         while (true) {
             try {
                 input = InputSystem.inputInt();
-            } catch (InputMismatchException e) {
-                System.out.println("\n숫자만 입력해주세요.\n");
-                InputSystem.clearBuffer();
-                continue;
-            }
-            if (!database.getOnCartProducts().isEmpty()) {
-                if (input < 0 || input > database.getCategoriesSize() + 3) {
-                    // 카테고리 리스트의 인덱스 예외처리
-                    System.out.println("\n선택지에 해당하는 숫자를 입력해주세요.\n");
+
+                // 카테고리를 선택해서 번호를 반환하는 함수 예외시 반복
+
+                // 장바구니에 상품이 없다면 0~카테고리 사이즈, 6 입력 가능
+                // 관리자 입력 먼저 검사
+
+                if (input == 0) {
+                    System.out.println("==========================\n프로그램을 종료합니다.");
+                    throw new LoopEndException();
                 }
-            } else {
-                if (input < 0 || input > database.getCategoriesSize() && input != 6) {
-                    // 카테고리 리스트의 인덱스 예외처리
-                    System.out.println("\n카테고리에 해당하는 숫자를 입력해주세요.\n");
+
+                if (input == database.getCategoriesSize() + 3) {
+                    database.setScreenName("관리자인증");
                     InputSystem.clearBuffer();
                     throw new GoBackException();
+                } else if (database.getOnCartProducts().isEmpty()) {
+                    if (input < 0 || input >= database.getCategoriesSize()) {
+                        System.out.println("\n선택지에 해당하는 숫자를 입력해주세요.\n");
+                        InputSystem.clearBuffer();
+                        throw new GoBackException();
+                    } else
+                        break;
+                } else {
+                    if (input < 0 || input >= database.getCategoriesSize() + 3) {
+                        System.out.println("\n선택지에 해당하는 숫자를 입력해주세요.\n");
+                        InputSystem.clearBuffer();
+                        throw new GoBackException();
+                    } else if (input == database.getCategoriesSize() + 1) {
+                        database.setScreenName("장바구니");
+                        database.unsetRemoveMode();
+                        InputSystem.clearBuffer();
+                        throw new GoBackException();
+                    } else if (input == database.getCategoriesSize() + 2) {
+                        database.setScreenName("장바구니");
+                        database.setRemoveMode();
+                        InputSystem.clearBuffer();
+                        throw new GoBackException();
+                    } else
+                        break;
                 }
-            }
-            if (input == 0) {
-                System.out.println("==========================\n프로그램을 종료합니다.");
-                throw new LoopEndException();
-            }else if (input == database.getCategoriesSize() + 1) {
-                database.setScreenName("장바구니");
-                InputSystem.clearBuffer();
-                throw new GoBackException();
-            } else if (input == database.getCategoriesSize() + 2) {
-                System.out.println("주문 취소 버튼");
-            } else if (input == database.getCategoriesSize() + 3) {
-                database.setScreenName("관리자인증");
+            } catch (InputMismatchException e) {
+                System.out.println("\n선택지에 해당하는 숫자를 입력해주세요.\n");
                 InputSystem.clearBuffer();
                 throw new GoBackException();
             }
-
-            return input;
         }
+        return input;
     }
 
     // 선택한 카테고리 데이터베이스에 저장시키기
@@ -91,7 +103,7 @@ public class CategoryScreen implements Screen {
     }
 
     public void printCartMenu() {
-        if (database.getSelectedProducts().isEmpty())
+        if (database.getOnCartProducts().isEmpty())
             return;
         int size = database.getCategories().size();
 

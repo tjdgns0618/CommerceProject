@@ -9,6 +9,7 @@ public class Database {
     private Product product;
     private final String adminId = "123";
     private int loginTryCount = 0;
+    private boolean removeMode = false;
 
     // 카테고리들
     private List<Category> categories;
@@ -143,20 +144,24 @@ public class Database {
         categories.get(categoryNumber - 1).addProduct(product);
     }
 
+    public void setRemoveMode(){
+        removeMode = true;
+    }
+
+    public void unsetRemoveMode(){
+        removeMode = false;
+    }
+
+    public boolean getRemoveMode(){
+        return removeMode;
+    }
+
     public void addSelectedProduct(Product product){
         selectedProducts.add(product);
     }
 
-    public void setSelectedProducts(List<Product> selectedProducts){
-        this.selectedProducts = selectedProducts;
-    }
-
     public List<Product> getSelectedProducts(){
         return selectedProducts;
-    }
-
-    public void setSelectedCategory(Category category) {
-        this.category = category;
     }
 
     public void addOnCartProducts(Product product) {
@@ -169,6 +174,14 @@ public class Database {
 
     public List<Product> getProducts(){
         return this.products;
+    }
+
+    public void removeOnCartProduct(Product product){
+        onCartProducts.remove(product);
+    }
+
+    public void removeSelectedProduct(Product product){
+        selectedProducts.remove(product);
     }
 
 }

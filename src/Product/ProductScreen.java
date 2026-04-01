@@ -10,7 +10,8 @@ import java.util.List;
 public class ProductScreen implements Screen {
 
     private final Database database;
-
+    private List<Product> filteredProducts;
+    private Product selectedProduct;
     public ProductScreen(Database database) {
         this.database = database;
     }
@@ -27,15 +28,62 @@ public class ProductScreen implements Screen {
         addToCart();
     }
 
-    // 존재하는 상품들을 모두 출력하는 함수
-    private void printProducts() {
+    private List<Product> filterProducts(){
+
         List<Product> selectedProducts = database.getSelectedCategory().getProducts();
+
+        while(true) {
+            try {
+                System.out.println("\n[ " + database.getSelectedCategory().getCategoryName() + " 카테고리 }");
+                System.out.println("1. 전체 상품 보기");
+                System.out.println("2. 가격대별 필터링 (100만원 이하)");
+                System.out.println("3. 가격대별 필터링 (100만원 초과)");
+                System.out.println("0. 뒤로가기");
+
+                int inputFilter = InputSystem.inputInt();
+
+                switch (inputFilter) {
+                    case 1:
+                        filteredProducts = selectedProducts;
+                        break;
+                    case 2:
+                        filteredProducts = selectedProducts.stream().
+                                filter(product -> product.getProductPrice() <= 1000000).
+                                toList();
+                        break;
+                    case 3:
+                        filteredProducts = selectedProducts.stream().
+                                filter(product -> product.getProductPrice() > 1000000).
+                                toList();
+                        break;
+                    case 0:
+                        database.setScreenName("카테고리");
+                        InputSystem.clearBuffer();
+                        throw new GoBackException();
+                    default:
+                        throw new InputMismatchException();
+                }
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println("항목 내에 있는 숫자만 입력해주세요.");
+                InputSystem.clearBuffer();
+            }
+        }
+        return filteredProducts;
+    }
+
+    private void printUnderProducts(){
+
+    }
+
+    // 존재하는 상품들을 모두 출력하는 함수
+    private void printProducts(List<Product> filteredProducts) {
 
         int i = 1;
         // 선택한 카테고리의 이름을 출력해주며 상품들 출력
         // 여기는 선택한 카테고리의 이름을 표시해줘야 하니 카테고리 객체 사용
-        System.out.println("[ " + database.getSelectedCategory().getCategoryName() + " 카테고리 ]");
-        for (Product p : selectedProducts) {
+        System.out.println("\n[ " + database.getSelectedCategory().getCategoryName() + " 카테고리 ]");
+        for (Product p : filteredProducts) {
             // 14칸을 소지하고 들어오는 문자를 왼쪽 정렬 시키기
             System.out.printf(i + ". %-14s", p.getProductName());
             // 10칸을 소지하고 1000 단위로 , 를 찍어주고 오른쪽 정렬
@@ -53,7 +101,7 @@ public class ProductScreen implements Screen {
         int inputNum;
         InputSystem.clearBuffer();
         while (true) {
-            printProducts();
+            printProducts(filterProducts());
 
             try {
                 inputNum = InputSystem.inputInt();
@@ -63,8 +111,7 @@ public class ProductScreen implements Screen {
                 continue;
             }
 
-            if (inputNum < 0 || inputNum > database.getProducts().size()) {
-                System.out.println(database.getProducts().size());
+            if (inputNum < 0 || inputNum > filteredProducts.size()) {
                 System.out.println("\n카테고리에 해당하는 숫자를 입력해주세요.\n");
                 continue;
             }
@@ -83,16 +130,15 @@ public class ProductScreen implements Screen {
     // printProducts 도 따로 만들기
     // commerceSystem.selectProduct() <- 딱보면 이상한 느낌이 든다 == 여기서 할 일이 아니다.
     public void selectProduct(int productID) {
-        database.setProduct(productID);
+        selectedProduct = filteredProducts.get(productID - 1);
     }
 
     public void addToCart() {
         int input;
-        Product product = database.getSelectedProduct();
 
         while(true) {
             try {
-                product.printProductInfo();
+                selectedProduct.printProductInfo();
                 System.out.println("위 상품을 장바구니에 추가하시겠습니까?");
                 System.out.println("1. 확인        2. 취소");
                 input = InputSystem.inputInt();
@@ -100,16 +146,16 @@ public class ProductScreen implements Screen {
                     case 1:
                         boolean exist = false;
                         // 상품 수량이 없으면 주문 불가
-                        if (product.getProductStock() == 0) {
+                        if (selectedProduct.getProductStock() == 0) {
                             System.out.println("주문 가능 수량이 없습니다.");
                             break;
                         }
 
                         for (Product p : database.getOnCartProducts()) {
                             // 이미 담은 상품인지 검사
-                            if (product.getProductName().equals(p.getProductName())) {
+                            if (selectedProduct.getProductName().equals(p.getProductName())) {
                                 exist = true;
-                                if (p.getProductStock() < database.getSelectedProduct().getProductStock()) {
+                                if (p.getProductStock() < selectedProduct.getProductStock()) {
                                     p.increaseStock();
                                     System.out.println(p.getProductName() + "가 장바구니에 1개 더 추가되었습니다.");
                                 } else {
@@ -120,8 +166,8 @@ public class ProductScreen implements Screen {
                         }
                         if (!exist) {
                             // 아직 담지 않은 상품이라면 새로 담기
-                            makeCartProduct(product);
-                            System.out.println(database.getSelectedProduct().getProductName() + "가 장바구니에 추가되었습니다.");
+                            makeCartProduct(selectedProduct);
+                            System.out.println(selectedProduct.getProductName() + "가 장바구니에 추가되었습니다.");
                         }
                         throw new GoBackException();
                     case 2:
