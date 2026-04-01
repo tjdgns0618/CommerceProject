@@ -14,7 +14,7 @@ public class CategoryScreen implements Screen {
     }
 
     @Override
-    public void display() throws LoopEndException {
+    public String display() throws LoopEndException {
         int categoryID = 0;
         // 1. 카테고리 목록 출력
         printCategories();
@@ -23,7 +23,8 @@ public class CategoryScreen implements Screen {
         categoryID = returnCategoryNumber();
         // 3. 카테고리 선택
         selectCategory(categoryID);
-        database.setScreenName("상품선택");
+
+        return "상품선택";
     }
 
     // 존재하는 카테고리 전체 출력해주는 함수
@@ -59,38 +60,35 @@ public class CategoryScreen implements Screen {
                 }
 
                 if (input == database.getCategoriesSize() + 3) {
-                    database.setScreenName("관리자인증");
                     InputSystem.clearBuffer();
-                    throw new GoBackException();
+                    throw new GoBackException("관리자인증");
                 } else if (database.getOnCartProducts().isEmpty()) {
-                    if (input < 0 || input >= database.getCategoriesSize()) {
+                    if (input < 0 || input >= database.getCategoriesSize() + 1) {
                         System.out.println("\n선택지에 해당하는 숫자를 입력해주세요.\n");
                         InputSystem.clearBuffer();
-                        throw new GoBackException();
+                        throw new GoBackException("카테고리");
                     } else
                         break;
                 } else {
                     if (input < 0 || input >= database.getCategoriesSize() + 3) {
                         System.out.println("\n선택지에 해당하는 숫자를 입력해주세요.\n");
                         InputSystem.clearBuffer();
-                        throw new GoBackException();
+                        throw new GoBackException("카테고리");
                     } else if (input == database.getCategoriesSize() + 1) {
-                        database.setScreenName("장바구니");
                         database.unsetRemoveMode();
                         InputSystem.clearBuffer();
-                        throw new GoBackException();
+                        throw new GoBackException("장바구니");
                     } else if (input == database.getCategoriesSize() + 2) {
-                        database.setScreenName("장바구니");
                         database.setRemoveMode();
                         InputSystem.clearBuffer();
-                        throw new GoBackException();
+                        throw new GoBackException("장바구니");
                     } else
                         break;
                 }
             } catch (InputMismatchException e) {
                 System.out.println("\n선택지에 해당하는 숫자를 입력해주세요.\n");
                 InputSystem.clearBuffer();
-                throw new GoBackException();
+                throw new GoBackException("카테고리");
             }
         }
         return input;

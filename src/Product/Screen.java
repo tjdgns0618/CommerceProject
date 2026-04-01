@@ -3,5 +3,5 @@ package Product;
 import Exception.LoopEndException;
 
 public interface Screen {
-    public void display() throws LoopEndException;
+    public String display() throws LoopEndException;
 }

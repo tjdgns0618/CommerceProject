@@ -17,7 +17,7 @@ public class ProductScreen implements Screen {
     }
 
     @Override
-    public void display() throws LoopEndException {
+    public String display() throws LoopEndException {
         // 4. 상품 목록 출력
 
         // 5. 입력 받기
@@ -26,6 +26,8 @@ public class ProductScreen implements Screen {
         selectProduct(input);
         // 7. 상품 카트에 추가하기
         addToCart();
+
+        return "카테고리";
     }
 
     private List<Product> filterProducts(){
@@ -57,9 +59,8 @@ public class ProductScreen implements Screen {
                                 toList();
                         break;
                     case 0:
-                        database.setScreenName("카테고리");
                         InputSystem.clearBuffer();
-                        throw new GoBackException();
+                        throw new GoBackException("카테고리");
                     default:
                         throw new InputMismatchException();
                 }
@@ -70,10 +71,6 @@ public class ProductScreen implements Screen {
             }
         }
         return filteredProducts;
-    }
-
-    private void printUnderProducts(){
-
     }
 
     // 존재하는 상품들을 모두 출력하는 함수
@@ -118,9 +115,8 @@ public class ProductScreen implements Screen {
             break;
         }
         if (inputNum == 0) {
-            database.setScreenName("카테고리");
             InputSystem.clearBuffer();
-            throw new GoBackException();
+            throw new GoBackException("카테고리");
         }
         return inputNum;
     }
@@ -169,9 +165,9 @@ public class ProductScreen implements Screen {
                             makeCartProduct(selectedProduct);
                             System.out.println(selectedProduct.getProductName() + "가 장바구니에 추가되었습니다.");
                         }
-                        throw new GoBackException();
+                        throw new GoBackException("카테고리");
                     case 2:
-                        throw new GoBackException();
+                        throw new GoBackException("카테고리");
                 }
             }catch (InputMismatchException e) {
                 System.out.println("항목에 존재하는 숫자만 입력해주세요.");

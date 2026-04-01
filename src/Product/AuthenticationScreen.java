@@ -13,19 +13,18 @@ public class AuthenticationScreen implements Screen {
     }
 
     @Override
-    public void display() throws LoopEndException {
+    public String display() throws LoopEndException {
         String inputID;
         // 1. 관리자 아이디 입력 받기
         inputID = inputAdminID();
         // 2. 관리자 인증 성공 실패 여부 확인하는 함수, 관리자 인증 성공시 관리자 스크린으로 변경
-        checkID(inputID);
+        return checkID(inputID);
     }
 
     private String inputAdminID() {
         if(database.getLoginTryCount() > 2) {
             System.out.println("\n로그인 잠금 : 관리자에게 문의해보시기 바랍니다.\n");
-            database.setScreenName("카테고리");
-            throw new GoBackException();
+            throw new GoBackException("카테고리");
         }
         String adminId;
 
@@ -41,14 +40,15 @@ public class AuthenticationScreen implements Screen {
         }
     }
 
-    private void checkID(String id) {
+    private String checkID(String id) {
         if (id.equals(database.getAdminId())) {
             System.out.println("성공하였습니다.");
-            database.setScreenName("관리자모드");
             database.resetLoginTryCount();
+            return "관리자모드";
         } else {
             database.addLoginTryCount();
             System.out.println("\n비밀번호가 틀렸습니다. 남은 횟수 : " + database.getLoginTryCount() + " / 3");
+            return "관리자인증";
         }
     }
 }
