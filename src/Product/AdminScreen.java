@@ -11,6 +11,7 @@ public class AdminScreen implements Screen {
     private Product editProduct;
     private Category editCategory;
     private Product onCartEditProduct;
+    private Product selectedProduct;
 
     public AdminScreen(Database database) {
         this.database = database;
@@ -159,7 +160,7 @@ public class AdminScreen implements Screen {
     }
 
     private void findProductFromAllCategories() {
-        System.out.print("수정할 상품명을 입력하세요 : ");
+        System.out.print("\n수정할 상품명을 입력하세요 : ");
         String editProductName = InputSystem.inputString();
 
         for (Category category : database.getCategories()) {
@@ -176,6 +177,11 @@ public class AdminScreen implements Screen {
                         equals(editProductName)).
                         findFirst().
                         orElse(null);
+                selectedProduct = database.getSelectedProducts().stream().
+                        filter(product -> product.getProductName().
+                                equals(editProductName)).
+                        findFirst().
+                        orElse(null);
                 break;
             }
         }
@@ -188,7 +194,7 @@ public class AdminScreen implements Screen {
     private void editFindProduct() {
         int input;
         while (true) {
-            System.out.println("수정할 항목을 선택해주세요.");
+            System.out.println("\n수정할 항목을 선택해주세요.");
             System.out.println("1. 가격");
             System.out.println("2. 설명");
             System.out.println("3. 재고수량");
@@ -252,6 +258,8 @@ public class AdminScreen implements Screen {
     private void deleteProduct(){
         System.out.println(editProduct.getProductName() + "를 삭제하겠습니다...");
         editCategory.removeProduct(editProduct);
+        database.removeOnCartProduct(onCartEditProduct);
+        database.removeSelectedProduct(selectedProduct);
 
         System.out.println("삭제가 완료되었습니다.");
         throw new GoBackException();
