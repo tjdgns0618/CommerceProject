@@ -21,7 +21,7 @@ public class Product {
         // 10칸을 소지하고 1000 단위로 , 를 찍어주고 오른쪽 정렬
         System.out.printf("|%,11d원", getProductPrice());
         System.out.print(" | " + getProductDescription());
-        System.out.printf(" | 재고 :%,3d개\n\n", getProductStock());
+        System.out.printf(" | 재고 :%,3d개\n", getProductStock());
     }
 
     public String getProductName() {
@@ -40,14 +40,6 @@ public class Product {
         return productStock;
     }
 
-    public void decreaseStock() {
-        if (productStock > 0)
-            productStock--;
-        else {
-            throw new IllegalArgumentException();
-        }
-    }
-
     public void increaseStock() {
         productStock++;
     }
@@ -56,7 +48,15 @@ public class Product {
         productStock -= amount;
     }
 
-    public void addStock(int amount) {
-        productStock += amount;
+    public void setProductPrice(int productPrice) {
+        this.productPrice = productPrice;
+    }
+
+    public void setProductDescription(String productDescription) {
+        this.productDescription = productDescription;
+    }
+
+    public void setProductStock(int productStock) {
+        this.productStock = productStock;
     }
 }

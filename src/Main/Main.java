@@ -1,10 +1,9 @@
 package Main;
 
-import Exception.LoopEndException;
 import Commerce.CommerceSystem;
 
 public class Main {
-    public static void main(String[] args) throws LoopEndException {
+    public static void main(String[] args) {
         CommerceSystem commerceSystem = new CommerceSystem();
 
         commerceSystem.start();
