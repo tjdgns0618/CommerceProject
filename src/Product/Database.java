@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Database {
-    private String screenName;
     private Category category;
-    private Product product;
     private final String adminId = "123";
     private int loginTryCount = 0;
     private boolean removeMode = false;
@@ -21,21 +19,37 @@ public class Database {
     // 장바구니에 담은 상품들 리스트
     private List<Product> onCartProducts = new  ArrayList<Product>();
 
-    /**
-     *
-     * @param screenName
-     * 스크린 이름을 초기화하는 함수
-     */
-    public void setScreenName(String screenName){
-        this.screenName = screenName;
-    }
+    public Database(){
+        Product electronicProduct1 = new Product("Galaxy S25", 1200000, "최신 안드로이드 스마트폰", 30);
+        Product electronicProduct2 = new Product("iPhone 16", 1350000, "Apple의 최신 스마트폰", 15);
+        Product electronicProduct3 = new Product("MacBook Pro", 2400000, "M3 칩셋이 탑재된 노트북", 5);
+        Product electronicProduct4 = new Product("AirPods", 350000, "노이즈 캔슬링 무선 이어폰", 0);
 
-    /**
-     *
-     * @return 현재 스크린 이름
-     */
-    public String getScreenName() {
-        return screenName;
+        Product clothesProduct1 = new Product("Adidas Pants", 20000, "아디다스의 신상 바지", 300);
+        Product clothesProduct2 = new Product("Adidas Shoes", 30000, "아디다스의 신상 신발", 100);
+
+        Product foodProduct1 = new Product("솔의눈", 1500, "왜먹는지 모르겠는 음료", 1);
+
+        // 카테고리별 객체 생성후 상품 객체 등록
+        Category electroCategory = new Category("전자제품");
+        electroCategory.addProduct(electronicProduct1);
+        electroCategory.addProduct(electronicProduct2);
+        electroCategory.addProduct(electronicProduct3);
+        electroCategory.addProduct(electronicProduct4);
+
+        Category clotheCategory = new Category("의류");
+        clotheCategory.addProduct(clothesProduct1);
+        clotheCategory.addProduct(clothesProduct2);
+
+        Category foodCategory = new Category("식품");
+        foodCategory.addProduct(foodProduct1);
+
+        List<Category> categories = new ArrayList<Category>();
+        categories.add(electroCategory);
+        categories.add(clotheCategory);
+        categories.add(foodCategory);
+
+        saveCategories(categories);
     }
 
     /**
@@ -51,23 +65,6 @@ public class Database {
      */
     public Category getSelectedCategory() {
         return this.category;
-    }
-
-    /**
-     *
-     * @param productID
-     * 상품들 중에서 선택된 상품을 초기화하는 함수
-     */
-    public void setProduct(int productID){
-        product = products.get(productID - 1);
-    }
-
-    /**
-     *
-     * @return 선택된 상품
-     */
-    public Product getSelectedProduct() {
-        return this.product;
     }
 
     /**
@@ -170,10 +167,6 @@ public class Database {
 
     public List<Product> getOnCartProducts(){
         return onCartProducts;
-    }
-
-    public List<Product> getProducts(){
-        return this.products;
     }
 
     public void removeOnCartProduct(Product product){

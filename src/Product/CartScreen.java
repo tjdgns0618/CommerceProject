@@ -17,7 +17,7 @@ public class CartScreen implements Screen {
     }
 
     @Override
-    public void display() {
+    public String display() {
         // 1. 선택한 상품들 출력
         // 2. 구매 할지 안할지 입력
         if(!database.getRemoveMode())
@@ -27,12 +27,14 @@ public class CartScreen implements Screen {
             selectDeleteProduct();
             deleteCartProduct();
         }
+
+        return "카테고리";
     }
 
     private void printCartProducts() {
         int i = 1;
         for (Product p : database.getOnCartProducts()) {
-            System.out.printf("\n%d. %s | %,d원 | %s | 수량 : %d개\n",
+            System.out.printf("%d. %s | %,d원 | %s | 수량 : %d개\n",
                     i++, p.getProductName(), p.getProductPrice(), p.getProductDescription(), p.getProductStock());
         }
     }
@@ -48,10 +50,9 @@ public class CartScreen implements Screen {
     public void printCart() {
         // 장바구니에 상품이 존재하지 않는데 들어올 경우
         if (database.getOnCartProducts().isEmpty()) {
-            database.setScreenName("카테고리");
-            throw new GoBackException();
+            throw new GoBackException("카테고리");
         }
-        System.out.println("\n[ 장바구니 내역 ]");
+        System.out.println("\n[ 장바구니 내역 ]\n");
         printCartProducts();
         System.out.println();
         System.out.println("[ 총 주문 금액 ]");
@@ -77,9 +78,8 @@ public class CartScreen implements Screen {
                         completeOrder(percentage);
                         break;
                     case 2:
-                        database.setScreenName("카테고리");
                         InputSystem.clearBuffer();
-                        throw new GoBackException();
+                        throw new GoBackException("카테고리");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("선택지에 해당하는 숫자를 입력해주세요.");
@@ -162,9 +162,9 @@ public class CartScreen implements Screen {
                     System.out.println(onCartProduct.getProductName() + "이 장바구니에서 제거되었습니다.");
                 } else if (input == 2) {
                     System.out.println("상품 제거를 취소하였습니다.");
+                    throw new GoBackException("장바구니");
                 } else
                     throw new InputMismatchException();
-                database.setScreenName("카테고리");
                 break;
             } catch (InputMismatchException e) {
                 System.out.println("항목 내의 숫자만 입력해주세요.");
