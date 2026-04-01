@@ -13,6 +13,10 @@ public class InputSystem {
         return  sc.nextInt();
     }
 
+    public static String inputString(){
+        return  sc.nextLine();
+    }
+
     public static void clearBuffer(){
         sc.nextLine();
     }
