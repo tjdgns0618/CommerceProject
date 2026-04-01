@@ -1,10 +1,10 @@
 package Product;
 
 public class Product {
-    private final String productName;
-    private final int productPrice;
-    private final String productDescription;
-    private final int productStock;
+    private String productName;
+    private int productPrice;
+    private String productDescription;
+    private int productStock;
 
     public Product(String productName, int productPrice, String productDescription, int productStock) {
         this.productName = productName;
@@ -17,7 +17,7 @@ public class Product {
     // product의 역할
     // printProductInfo로 이름을 바꾸기
     public void printProductInfo() {
-        System.out.printf("\n선택한 상품 :%-14s", getProductName());
+        System.out.printf("\n선택한 상품 : %-14s", getProductName());
         // 10칸을 소지하고 1000 단위로 , 를 찍어주고 오른쪽 정렬
         System.out.printf("|%,11d원", getProductPrice());
         System.out.print(" | " + getProductDescription());
@@ -40,5 +40,23 @@ public class Product {
         return productStock;
     }
 
+    public void decreaseStock() {
+        if (productStock > 0)
+            productStock--;
+        else {
+            throw new IllegalArgumentException();
+        }
+    }
 
+    public void increaseStock() {
+        productStock++;
+    }
+
+    public void subtractStock(int amount) {
+        productStock -= amount;
+    }
+
+    public void addStock(int amount) {
+        productStock += amount;
+    }
 }

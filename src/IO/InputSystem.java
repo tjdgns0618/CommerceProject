@@ -1,6 +1,5 @@
 package IO;
 
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class InputSystem {
