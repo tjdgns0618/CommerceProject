@@ -18,7 +18,7 @@ public class ProductScreen implements Screen {
     @Override
     public void display() throws LoopEndException {
         // 4. 상품 목록 출력
-        printProducts();
+
         // 5. 입력 받기
         int input = returnProductID();
         // 6. 상품 선택
@@ -53,9 +53,11 @@ public class ProductScreen implements Screen {
         int inputNum;
         InputSystem.clearBuffer();
         while (true) {
+            printProducts();
+
             try {
                 inputNum = InputSystem.inputInt();
-            }catch (InputMismatchException e){
+            } catch (InputMismatchException e) {
                 System.out.println("\n숫자만 입력해주세요.\n");
                 InputSystem.clearBuffer();
                 continue;
@@ -68,7 +70,7 @@ public class ProductScreen implements Screen {
             }
             break;
         }
-        if(inputNum == 0){
+        if (inputNum == 0) {
             database.setScreenName("카테고리");
             InputSystem.clearBuffer();
             throw new GoBackException();
@@ -80,51 +82,55 @@ public class ProductScreen implements Screen {
     // category의 역할
     // printProducts 도 따로 만들기
     // commerceSystem.selectProduct() <- 딱보면 이상한 느낌이 든다 == 여기서 할 일이 아니다.
-    public void selectProduct(int productID)  {
+    public void selectProduct(int productID) {
         database.setProduct(productID);
     }
 
     public void addToCart() {
         int input;
         Product product = database.getSelectedProduct();
-        System.out.printf("\"%s | %,d원 | %s\"\n",
-                product.getProductName(), product.getProductPrice(), product.getProductDescription());
-        System.out.println("위 상품을 장바구니에 추가하시겠습니까?");
-        System.out.println("1. 확인        2. 취소");
-        input = InputSystem.inputInt();
-        switch (input) {
-            case 1:
-                boolean exist = false;
-                // 상품 수량이 없으면 주문 불가
-                if (product.getProductStock() == 0) {
-                    System.out.println("주문 가능 수량이 없습니다.");
-                    break;
-                }
 
-                for (Product p : database.getSelectedProducts()) {
-                    // 이미 담은 상품인지 검사
-                    if (product.getProductName().equals(p.getProductName())) {
-                        exist = true;
-                        if (p.getProductStock() < database.getSelectedProduct().getProductStock()) {
-                            p.increaseStock();
-                            System.out.println(p.getProductName() + "가 장바구니에 1개 더 추가되었습니다.");
-                        } else {
-                            System.out.println("주문 가능 수량을 초과하였습니다.");
+        while(true) {
+            try {
+                product.printProductInfo();
+                System.out.println("위 상품을 장바구니에 추가하시겠습니까?");
+                System.out.println("1. 확인        2. 취소");
+                input = InputSystem.inputInt();
+                switch (input) {
+                    case 1:
+                        boolean exist = false;
+                        // 상품 수량이 없으면 주문 불가
+                        if (product.getProductStock() == 0) {
+                            System.out.println("주문 가능 수량이 없습니다.");
+                            break;
                         }
-                        break;
-                    }
+
+                        for (Product p : database.getOnCartProducts()) {
+                            // 이미 담은 상품인지 검사
+                            if (product.getProductName().equals(p.getProductName())) {
+                                exist = true;
+                                if (p.getProductStock() < database.getSelectedProduct().getProductStock()) {
+                                    p.increaseStock();
+                                    System.out.println(p.getProductName() + "가 장바구니에 1개 더 추가되었습니다.");
+                                } else {
+                                    System.out.println("주문 가능 수량을 초과하였습니다.");
+                                }
+                                break;
+                            }
+                        }
+                        if (!exist) {
+                            // 아직 담지 않은 상품이라면 새로 담기
+                            makeCartProduct(product);
+                            System.out.println(database.getSelectedProduct().getProductName() + "가 장바구니에 추가되었습니다.");
+                        }
+                        throw new GoBackException();
+                    case 2:
+                        throw new GoBackException();
                 }
-                if (!exist) {
-                    // 아직 담지 않은 상품이라면 새로 담기
-                    makeCartProduct(product);
-                    System.out.println(database.getSelectedProduct().getProductName() + "가 장바구니에 추가되었습니다.");
-                }
-                break;
-            case 2:
+            }catch (InputMismatchException e) {
+                System.out.println("항목에 존재하는 숫자만 입력해주세요.");
                 InputSystem.clearBuffer();
-                throw new GoBackException();
-            default:
-                System.out.println("아무 숫자 입력");
+            }
         }
     }
 

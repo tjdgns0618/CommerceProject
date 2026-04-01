@@ -17,7 +17,6 @@ public class CartScreen implements Screen {
     @Override
     public void display() throws LoopEndException {
         // 1. 선택한 상품들 출력
-
         // 2. 구매 할지 안할지 입력
         orderCart();
         // 3. 재고 정리

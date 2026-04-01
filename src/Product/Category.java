@@ -1,5 +1,6 @@
 package Product;
 
+import Exception.GoBackException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +25,11 @@ public class Category {
     public List<Product> getProducts() {
         return Collections.unmodifiableList(products);
     }
+
+    public void removeProduct(Product product) {
+        products.remove(product);
+    }
+
 }
 
 

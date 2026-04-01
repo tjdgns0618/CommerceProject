@@ -25,8 +25,6 @@ public class CommerceSystem {
     private final AuthenticationScreen  authenticationScreen =  new AuthenticationScreen(database);
     private final AdminScreen adminScreen =  new AdminScreen(database);
 
-    private final String adminCode = "tjdgns0618";
-
     protected boolean loopEnd = false;
 
     // CommerceSystem을 main이외에도 여기저기서 사용할 거면 main에 적어두는게 좋다.
@@ -73,7 +71,7 @@ public class CommerceSystem {
     }
 
     // 커머스 시스템 실행 함수
-    public void start() throws LoopEndException {
+    public void start(){
         while (!loopEnd) {
             try {
                 Screen currentScreen = screenMap.get(database.getScreenName());
@@ -84,6 +82,7 @@ public class CommerceSystem {
                 System.out.println("\nNullPointerException 발생.\n");
                 break;
             } catch (LoopEndException e) {
+                InputSystem.closeScanner();
                 loopEnd = true;
             } catch (GoBackException e) {
                 System.out.println(database.getScreenName() + "으로 갑니다.");

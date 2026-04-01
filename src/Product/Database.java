@@ -7,7 +7,7 @@ public class Database {
     private String screenName;
     private Category category;
     private Product product;
-    private final String adminId = "tjdgns0618";
+    private final String adminId = "123";
     private int loginTryCount = 0;
 
     // 카테고리들
