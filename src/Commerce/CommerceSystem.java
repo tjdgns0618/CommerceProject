@@ -26,10 +26,7 @@ public class CommerceSystem {
                 currentScreenName = currentScreen.display();
 
                 // 예외처리 부분=====================
-            } catch (NullPointerException e) {
-                System.out.println("\nNullPointerException 발생.\n");
-                break;
-            } catch (LoopEndException e) {
+            }  catch (LoopEndException e) {
                 InputSystem.closeScanner();
                 loopEnd = true;
             } catch (GoBackException e) {
